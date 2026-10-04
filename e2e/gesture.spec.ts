@@ -1,9 +1,11 @@
+import { existsSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import { FIXTURE_DIR } from './paths';
 import { hits, startApp } from './helpers';
 
 // The fake camera shows a real photo of a ✌️ hand (see global-setup.ts).
 test('a real ✌️ hand triggers its pad exactly once, and "learn gesture" works', async ({ page }) => {
+  test.skip(!existsSync(`${FIXTURE_DIR}/victory.y4m`), 'needs ffmpeg + internet to build the fake camera video');
   test.setTimeout(150_000);
   await startApp(page);
   await expect(page.getByTestId('camera-pill')).toHaveAttribute('data-status', 'live');

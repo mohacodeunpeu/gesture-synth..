@@ -33,6 +33,8 @@ aucun serveur, aucune donnée envoyée.
 Prérequis : **Node 20+** et npm.
 
 ```bash
+git clone https://github.com/mohacodeunpeu/gesture-synth.. moha-motion
+cd moha-motion
 npm install
 npm run dev          # http://localhost:5173
 ```
@@ -58,7 +60,7 @@ Ouvre l'adresse `https://192.168.x.x:5173` affichée, accepte l'avertissement de
 | `npm run preview` | sert le build |
 | `npm run lint` | ESLint |
 | `npm run test` | tests unitaires (Vitest) |
-| `npm run test:e2e` | tests de bout en bout dans Chromium avec fausse caméra + vraie photo de main |
+| `npm run test:e2e` | tests de bout en bout dans Chromium avec fausse caméra + vraie photo de main (1re fois : `npx playwright install chromium` ; le test geste a besoin de `ffmpeg`) |
 
 `npm run dev` / `build` copient automatiquement le moteur MediaPipe (WASM) depuis `node_modules` et
 téléchargent le modèle de main (~7,5 Mo) dans `public/mediapipe/` (non versionné). Sans internet au

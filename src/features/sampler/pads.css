@@ -200,10 +200,34 @@
   font-size: 13px;
 }
 
+/* Touch screens: no button inside pads. Chrome's touch target adjustment would redirect taps near
+   it to the button (opening the editor instead of playing). Editing uses the ✏️ button instead. */
 @media (hover: none) {
   .pad-edit {
-    opacity: 0.35;
+    display: none;
   }
+}
+
+.pads.editing .pad {
+  border-style: dashed;
+  border-color: var(--pad);
+  animation: edit-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes edit-pulse {
+  50% {
+    box-shadow: 0 0 18px color-mix(in srgb, var(--pad) 45%, transparent);
+  }
+}
+
+.pad-pencil {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 6, 10, 0.45);
+  color: #fff;
+  pointer-events: none;
 }
 
 @media (max-width: 880px) {

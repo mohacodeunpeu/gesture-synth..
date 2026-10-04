@@ -21,8 +21,9 @@ aucun serveur, aucune donnée envoyée.
 - **Apprendre un geste** : ouvre un pad → « Apprendre un geste » → fais ton geste 1 s → c'est assigné.
 - **Importer tes sons** (MP3, WAV, OGG, M4A…) : bouton, glisser-déposer sur un pad, ou clic sur un
   pad vide. Le silence du début est coupé automatiquement. Stockés dans ton navigateur (IndexedDB).
-- Éditeur de pad : nom, emoji, mode (one shot / gate / boucle / retrigger), volume, hauteur, pan,
-  découpe avec forme d'onde, fondus, à l'envers, groupe de coupure, polyphonie, touche clavier.
+- Éditeur de pad (clic droit ou ⋯ sur ordi, bouton **✏️ Éditer** puis un pad sur téléphone) : nom,
+  emoji, mode (one shot / gate / boucle / retrigger), volume, hauteur, pan, découpe avec forme
+  d'onde, fondus, à l'envers, groupe de coupure, polyphonie, touche clavier.
 - **Diagnostic** : état audio, latence, niveau, caméra, FPS, temps d'inférence, GPU/CPU, gestes en
   direct + boutons TEST / RESET.
 - Interface FR / EN, thème sombre, animations (squelette néon, bulles, explosions d'emojis).

@@ -71,6 +71,8 @@ export const en = {
   orClick: 'or click',
   importSound: 'Import sound',
   editPad: 'Edit pad',
+  editPads: 'Edit',
+  editModeHint: 'Edit mode — tap a pad to change it',
   dropToReplace: 'Drop to replace',
 
   // drawer

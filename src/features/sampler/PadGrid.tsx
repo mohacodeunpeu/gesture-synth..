@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Pencil } from 'lucide-react';
 import { performer, sampler } from '../../engine/instance';
 import { triggersForPad } from '../../engine/GestureMapper';
 import { Performance } from '../../engine/Performance';
@@ -14,8 +14,6 @@ import { GESTURE_EMOJI, MOTION_EMOJI } from '../../vision/gestureTypes';
 import { importToPad } from './importSound';
 import './pads.css';
 
-const LONG_PRESS_MS = 520;
-
 export function PadGrid() {
   const project = useProject((s) => s.project);
   const bank = activeBank(project);
@@ -24,6 +22,7 @@ export function PadGrid() {
   const learnPad = useSession((s) => s.learnPad);
   const selectedPad = useSession((s) => s.selectedPad);
   const drawer = useSession((s) => s.drawer);
+  const editMode = useSession((s) => s.editMode);
   const padEls = useRef<Array<HTMLDivElement | null>>([]);
   const progEls = useRef<Array<HTMLSpanElement | null>>([]);
   const lastProg = useRef<number[]>([]);
@@ -71,7 +70,7 @@ export function PadGrid() {
   });
 
   return (
-    <section className="pads" aria-label="pads" data-bank={bank.id}>
+    <section className={`pads ${editMode ? 'editing' : ''}`} aria-label="pads" data-bank={bank.id}>
       {bank.pads.map((pad, i) => (
         <Pad
           key={`${bank.id}-${i}`}
@@ -81,6 +80,7 @@ export function PadGrid() {
           keyLabel={keyLabels[padKeyCode(pad, i)] ?? padKeyCode(pad, i).replace(/^(Key|Digit)/, '')}
           triggers={triggersForPad(mapping, i)}
           learning={learnPad === i}
+          editMode={editMode}
           selected={drawer === 'pad' && selectedPad === i}
           padRef={(el) => {
             padEls.current[i] = el;
@@ -101,16 +101,17 @@ interface PadProps {
   keyLabel: string;
   triggers: TriggerDef[];
   learning: boolean;
+  editMode: boolean;
   selected: boolean;
   padRef: (el: HTMLDivElement | null) => void;
   progressRef: (el: HTMLSpanElement | null) => void;
 }
 
-const Pad = memo(function Pad({ index, bankId, pad, keyLabel, triggers, learning, selected, padRef, progressRef }: PadProps) {
+const Pad = memo(function Pad({ index, bankId, pad, keyLabel, triggers, learning, editMode, selected, padRef, progressRef }: PadProps) {
   const t = useT();
   const lang = useSettings((s) => s.lang);
   const fileRef = useRef<HTMLInputElement>(null);
-  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastPointerType = useRef('mouse');
   const [dragOver, setDragOver] = useState(false);
   const empty = !pad.sample;
   const color = PAD_COLORS[pad.color % PAD_COLORS.length];
@@ -121,23 +122,29 @@ const Pad = memo(function Pad({ index, bankId, pad, keyLabel, triggers, learning
 
   const openEditor = () => useSession.getState().openDrawer('pad', index);
 
+  // No long-press-to-edit on touch screens: holding a pad is a musical gesture (gate pads, risers),
+  // and on a busy main thread a quick tap could be misread as a long press. Use the ⋯ button.
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    lastPointerType.current = e.pointerType;
     if (e.button !== 0) return;
     if ((e.target as HTMLElement).closest('.pad-edit')) return;
     useSession.getState().selectPad(index);
+    if (editMode) {
+      openEditor();
+      return;
+    }
     if (empty) {
       fileRef.current?.click();
       return;
     }
     e.currentTarget.setPointerCapture?.(e.pointerId);
-    performer.triggerPad(index, 'pointer', { velocity: e.pointerType === 'pen' && e.pressure > 0 ? Math.max(0.4, e.pressure) : 1 });
-    if (e.pointerType === 'touch') pressTimer.current = setTimeout(openEditor, LONG_PRESS_MS);
+    const result = performer.triggerPad(index, 'pointer', { velocity: e.pointerType === 'pen' && e.pressure > 0 ? Math.max(0.4, e.pressure) : 1 });
+    // tiny haptic tick on phones that support it (Android); silently ignored elsewhere
+    if (e.pointerType === 'touch' && result === 'played') navigator.vibrate?.(8);
   };
 
   const onPointerUp = () => {
-    if (pressTimer.current) clearTimeout(pressTimer.current);
-    pressTimer.current = null;
-    if (!empty) performer.releasePad(index);
+    if (!empty && !editMode) performer.releasePad(index);
   };
 
   return (
@@ -155,7 +162,8 @@ const Pad = memo(function Pad({ index, bankId, pad, keyLabel, triggers, learning
       onPointerCancel={onPointerUp}
       onContextMenu={(e) => {
         e.preventDefault();
-        openEditor();
+        // right-click opens the editor; a touch long-press (Android) does not
+        if (lastPointerType.current === 'mouse') openEditor();
       }}
       onDragOver={(e) => {
         e.preventDefault();
@@ -190,8 +198,14 @@ const Pad = memo(function Pad({ index, bankId, pad, keyLabel, triggers, learning
         </>
       )}
       {dragOver && !empty && <span className="pad-drop">{t('dropToReplace')}</span>}
+      {editMode && (
+        <span className="pad-pencil" aria-hidden>
+          <Pencil size={15} />
+        </span>
+      )}
       <button
         className="pad-edit"
+        data-testid={`pad-edit-${index}`}
         aria-label={t('editPad')}
         title={t('editPad')}
         onPointerDown={(e) => e.stopPropagation()}

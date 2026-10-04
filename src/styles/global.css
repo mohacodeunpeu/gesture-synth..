@@ -47,6 +47,8 @@ body {
   -webkit-tap-highlight-color: transparent;
   overflow: hidden;
   overscroll-behavior: none;
+  /* no double-tap zoom (iOS ignores user-scalable=no) */
+  touch-action: manipulation;
 }
 
 button,

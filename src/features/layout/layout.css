@@ -137,9 +137,16 @@
   .mode-label {
     display: none;
   }
-  .bottombar .hint {
+  .bottombar .hint:not(.edit-hint) {
     display: none;
   }
+}
+
+.bottombar .edit-hint {
+  color: var(--green);
+  font-weight: 600;
+  white-space: normal;
+  line-height: 1.2;
 }
 
 @media (max-width: 880px) {
@@ -196,5 +203,18 @@
   }
   .btn-label-wide {
     display: none;
+  }
+}
+
+/* landscape phones: height is precious, keep the top bar on one line */
+@media (max-width: 880px) and (max-height: 520px) and (orientation: landscape) {
+  .topbar {
+    grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+    grid-template-areas: 'brand modes bank status actions';
+    padding-top: calc(6px + var(--safe-top));
+    padding-bottom: 6px;
+  }
+  .bank-switch {
+    justify-self: center;
   }
 }

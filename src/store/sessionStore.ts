@@ -18,6 +18,8 @@ interface SessionStore {
   selectedPad: number;
   /** pad waiting for a gesture to be learned */
   learnPad: number | null;
+  /** touch-friendly edit mode: tapping a pad opens its editor instead of playing it */
+  editMode: boolean;
   toasts: Toast[];
   persistenceOk: boolean;
   /** KeyboardEvent.code → label printed on the user's keyboard */
@@ -27,6 +29,7 @@ interface SessionStore {
   closeDrawer: () => void;
   selectPad: (pad: number) => void;
   setLearnPad: (pad: number | null) => void;
+  setEditMode: (on: boolean) => void;
   toast: (key: DictKey, kind?: Toast['kind'], vars?: Toast['vars']) => void;
   dismiss: (id: string) => void;
   setKeyLabels: (labels: Record<string, string>) => void;
@@ -37,14 +40,17 @@ export const useSession = create<SessionStore>()((set, get) => ({
   drawer: null,
   selectedPad: 0,
   learnPad: null,
+  editMode: false,
   toasts: [],
   persistenceOk: true,
   keyLabels: {},
   setPhase: (phase) => set({ phase }),
   openDrawer: (tab, pad) => set({ drawer: tab, ...(pad !== undefined ? { selectedPad: pad } : {}) }),
-  closeDrawer: () => set({ drawer: null, learnPad: null }),
+  // leaving the editor always leaves edit mode, so pads never stay silently "in edit"
+  closeDrawer: () => set({ drawer: null, learnPad: null, editMode: false }),
   selectPad: (selectedPad) => set({ selectedPad }),
   setLearnPad: (learnPad) => set({ learnPad }),
+  setEditMode: (editMode) => set(editMode ? { editMode } : { editMode, drawer: get().drawer === 'pad' ? null : get().drawer }),
   toast: (key, kind = 'info', vars) => {
     // identical toasts are not stacked
     const existing = get().toasts.find((t) => t.key === key && JSON.stringify(t.vars) === JSON.stringify(vars));

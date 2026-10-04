@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Upload, Volume2 } from 'lucide-react';
+import { Pencil, Upload, Volume2 } from 'lucide-react';
 import { audio } from '../../engine/instance';
 import { useT } from '../../hooks/useT';
 import { Meter } from '../../components/Meter';
@@ -11,6 +11,8 @@ export function BottomBar() {
   const t = useT();
   const fileRef = useRef<HTMLInputElement>(null);
   const keyLabels = useSession((s) => s.keyLabels);
+  const editMode = useSession((s) => s.editMode);
+  const setEditMode = useSession((s) => s.setEditMode);
   const label = (code: string) => keyLabels[code] ?? code.replace(/^(Key|Digit)/, '');
   const rows = [0, 4, 8, 12].map((i) => `${label(DEFAULT_PAD_KEYS[i])}-${label(DEFAULT_PAD_KEYS[i + 3])}`).join(' · ');
 
@@ -44,7 +46,11 @@ export function BottomBar() {
           if (file) void importToFreePad(file);
         }}
       />
-      <span className="hint">{t('shortcutsHint', { rows })}</span>
+      <button className={`btn ${editMode ? 'btn-green' : ''}`} aria-pressed={editMode} onClick={() => setEditMode(!editMode)} data-testid="edit-mode">
+        <Pencil size={16} />
+        <span className="btn-label-wide">{t('editPads')}</span>
+      </button>
+      {editMode ? <span className="hint edit-hint">{t('editModeHint')}</span> : <span className="hint">{t('shortcutsHint', { rows })}</span>}
     </footer>
   );
 }

@@ -22,7 +22,7 @@ test('V0.1 flow: START → test audio → camera → pads (keys + mouse) → imp
   await expect(page.getByTestId('camera-pill')).toHaveAttribute('data-status', 'live');
 
   // 16 pads, all filled in the MEMES bank
-  await expect(page.locator('[data-testid^="pad-"]')).toHaveCount(16);
+  await expect(page.locator('.pads > .pad')).toHaveCount(16);
   await expect(page.getByTestId('pad-0')).toContainText('BRUH');
 
   // keyboard → pad 1

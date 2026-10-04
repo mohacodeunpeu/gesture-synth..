@@ -69,6 +69,8 @@ export const fr: Dict = {
   orClick: 'ou clique',
   importSound: 'Importer un son',
   editPad: 'Modifier le pad',
+  editPads: 'Éditer',
+  editModeHint: 'Mode édition — touche un pad pour le modifier',
   dropToReplace: 'Lâche pour remplacer',
 
   tab_pad: 'Pad',

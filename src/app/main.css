@@ -1,0 +1,35 @@
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background:
+    radial-gradient(60% 50% at 15% 0%, rgba(34, 229, 255, 0.07), transparent 70%),
+    radial-gradient(50% 50% at 100% 100%, rgba(45, 255, 180, 0.05), transparent 70%),
+    var(--bg);
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+}
+
+.workspace {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr);
+  gap: 14px;
+  padding: 0 14px;
+}
+
+@media (max-width: 880px) {
+  .workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(180px, 40%) minmax(0, 1fr);
+    gap: 10px;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 880px) and (orientation: landscape) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: 1fr;
+  }
+}

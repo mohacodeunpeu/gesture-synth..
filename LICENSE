@@ -1,0 +1,10 @@
+Copyright (c) 2026 mohacodeunpeu. All rights reserved.
+
+No open-source license has been chosen yet for this project. Until a LICENSE is published here,
+the default copyright rules apply: you may view the code, but not copy, modify or redistribute it
+without permission.
+
+Third-party components keep their own licenses (see package.json dependencies), notably:
+- @mediapipe/tasks-vision and the MediaPipe hand landmark model — Apache License 2.0
+- React — MIT, Vite — MIT, Zustand — MIT, idb — ISC, fflate — MIT, lucide-react — ISC
+- Space Grotesk and JetBrains Mono fonts — SIL Open Font License 1.1

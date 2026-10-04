@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+dev-dist/
+*.tsbuildinfo
+
+# vendored at build time by scripts/vendor-mediapipe.mjs (copied from node_modules / downloaded)
+public/mediapipe/
+
+# test output
+coverage/
+playwright-report/
+test-results/
+e2e/.fixtures/
+
+# personal audio must never be committed by accident (import it in the app instead;
+# it is stored locally in your browser). See public/sounds/README.md.
+public/sounds/**
+!public/sounds/README.md
+*.mp3
+*.wav
+*.m4a
+*.ogg
+*.aac
+*.flac
+
+# misc
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+.vscode/*
+!.vscode/extensions.json
+.idea/

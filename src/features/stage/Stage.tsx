@@ -180,47 +180,62 @@ function describeAction(a: ActionDef, t: TFn): string {
 }
 
 function CheatSheet({ rules, t, innerRef, lang }: { rules: DiscreteRule[]; t: TFn; bankName: string; innerRef: React.RefObject<HTMLDivElement | null>; lang: string }) {
-  const [open, setOpen] = useState(true);
-  const set = useSettings((s) => s.set);
+  // expanded on large screens, folded into a chip on phones (it would cover the camera)
+  const [open, setOpen] = useState(() => window.matchMedia('(min-width: 881px)').matches);
   const project = useProject((s) => s.project);
-  const rows = useMemo(
-    () =>
-      rules.map((r) => {
-        const trig = r.trigger;
-        const emoji = trig.kind === 'gesture' ? GESTURE_EMOJI[trig.gesture] : MOTION_EMOJI[trig.motion];
-        const hand = trig.hand === 'Any' ? '' : trig.hand === 'Left' ? (lang === 'fr' ? 'G' : 'L') : lang === 'fr' ? 'D' : 'R';
-        return { id: r.id, emoji, hand, gesture: trig.kind === 'gesture' ? trig.gesture : trig.motion, handSel: trig.hand, label: describeAction(r.action, t) };
-      }),
+  const groups = useMemo(() => {
+    const out: Record<'Right' | 'Left' | 'Any', Array<{ id: string; emoji: string; gesture: string; handSel: string; label: string }>> = { Right: [], Left: [], Any: [] };
+    for (const r of rules) {
+      const trig = r.trigger;
+      out[trig.hand].push({
+        id: r.id,
+        emoji: trig.kind === 'gesture' ? GESTURE_EMOJI[trig.gesture] : MOTION_EMOJI[trig.motion],
+        gesture: trig.kind === 'gesture' ? trig.gesture : trig.motion,
+        handSel: trig.hand,
+        label: describeAction(r.action, t),
+      });
+    }
+    return out;
     // project: pad names may change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rules, t, lang, project],
-  );
+  }, [rules, t, lang, project]);
+
   if (!open) {
     return (
-      <button className="cheat-toggle" onClick={() => setOpen(true)}>
-        {t('cheatTitle')}
+      <button className="cheat-toggle" onClick={() => setOpen(true)} data-testid="cheat-open">
+        ✋ {t('cheatTitle')}
       </button>
     );
   }
+  const col = (side: 'Right' | 'Left' | 'Any') =>
+    groups[side].length > 0 && (
+      <div className="cheat-col" key={side}>
+        <div className="cheat-hand" data-side={side}>
+          {side === 'Any' ? t('anyHand') : `${t(side === 'Left' ? 'left' : 'right')} (${t(side === 'Left' ? 'leftShort' : 'rightShort')})`}
+        </div>
+        <ul>
+          {groups[side].map((r) => (
+            <li key={r.id} data-gesture={r.gesture} data-hand={r.handSel}>
+              <span className="cheat-g">{r.emoji}</span>
+              <span className="cheat-a">{r.label}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
   return (
-    <div className="cheat" ref={innerRef}>
+    <div className="cheat" ref={innerRef} data-testid="cheat">
       <div className="cheat-head">
         <span>{t('cheatTitle')}</span>
-        <button className="btn btn-ghost btn-icon btn-sm" aria-label={t('hide')} onClick={() => (window.innerWidth < 880 ? set({ showCheatSheet: false }) : setOpen(false))}>
+        <button className="btn btn-ghost btn-icon btn-sm" aria-label={t('hide')} onClick={() => setOpen(false)}>
           <X size={14} />
         </button>
       </div>
-      <ul>
-        {rows.map((r) => (
-          <li key={r.id} data-gesture={r.gesture} data-hand={r.handSel}>
-            <span className="cheat-g">
-              {r.emoji}
-              <small>{r.hand}</small>
-            </span>
-            <span className="cheat-a">{r.label}</span>
-          </li>
-        ))}
-      </ul>
+      <div className="cheat-cols">
+        {col('Right')}
+        {col('Left')}
+      </div>
+      {col('Any')}
     </div>
   );
 }

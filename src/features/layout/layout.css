@@ -144,24 +144,48 @@
 
 @media (max-width: 880px) {
   .topbar {
-    flex-wrap: wrap;
-    gap: 8px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      'brand modes actions'
+      'bank bank status';
+    gap: 8px 10px;
     padding: calc(8px + var(--safe-top)) 10px 8px;
   }
   .brand {
+    grid-area: brand;
     font-size: 16px;
+    align-self: center;
   }
   .brand-b {
     display: none;
   }
+  .modes {
+    grid-area: modes;
+    justify-self: start;
+  }
+  .mode-btn {
+    padding: 6px 9px;
+  }
+  .bank-switch {
+    grid-area: bank;
+  }
+  .bank-select select {
+    max-width: 150px;
+    height: 32px;
+  }
   .status {
-    order: 5;
+    grid-area: status;
     margin-left: 0;
-    width: 100%;
-    justify-content: flex-start;
+    gap: 6px;
+  }
+  .status .pill {
+    height: 28px;
+    padding: 0 9px;
+    font-size: 12px;
   }
   .top-actions {
-    margin-left: auto;
+    grid-area: actions;
   }
   .bottombar {
     padding: 8px 10px calc(8px + var(--safe-bottom));
